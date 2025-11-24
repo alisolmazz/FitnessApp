@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-5">Yönetim Paneli</h1>
+
+    <div class="row text-center">
+        <!-- Hizmetler -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100 border-primary">
+                <div class="card-body">
+                    <h3 class="card-title text-primary"><i class="fa fa-dumbbell"></i> Hizmetler</h3>
+                    <p>Spor salonu hizmetlerini ve fiyatlarını yönet.</p>
+                    <a asp-action="Services" class="btn btn-primary w-100">Hizmetleri Yönet</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eğitmenler -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100 border-warning">
+                <div class="card-body">
+                    <h3 class="card-title text-warning"><i class="fa fa-user-ninja"></i> Eğitmenler</h3>
+                    <p>Antrenörleri ve çalışma saatlerini yönet.</p>
+                    <a asp-action="Trainers" class="btn btn-warning w-100">Eğitmenleri Yönet</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- RANDEVULAR (Link Güncellendi) -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100 border-success">
+                <div class="card-body">
+                    <h3 class="card-title text-success"><i class="fa fa-calendar-check"></i> Randevular</h3>
+                    <p>Üye taleplerini onayla veya reddet.</p>
+                    <!-- BURASI -->
+                    <a asp-action="Appointments" class="btn btn-success w-100">Talepleri Yönet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

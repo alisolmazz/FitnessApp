@@ -1,0 +1,55 @@
+﻿@model IEnumerable<FitnessApp.Models.Service>
+@{
+    ViewData["Title"] = "Hizmetler";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Hizmet Listesi</h2>
+        <a asp-action="CreateService" class="btn btn-success">+ Yeni Hizmet Ekle</a>
+    </div>
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Resim</th>
+                <th>Hizmet Adı</th>
+                <th>Açıklama</th>
+                <th>Süre (dk)</th>
+                <th>Fiyat</th>
+                <th style="width: 100px;">İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="~/images/@item.ImageUrl" width="50" height="50" style="object-fit: cover;" />
+                        </td>
+                        <td>@item.ServiceName</td>
+                        <td>@item.Description</td>
+                        <td>@item.DurationMinutes</td>
+                        <td>@item.Price ₺</td>
+                        <td class="text-center">
+                            <!-- SİLME BUTONU -->
+                            <a asp-action="DeleteService" asp-route-id="@item.ServiceId"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('@item.ServiceName hizmetini silmek istediğinize emin misiniz?');">
+                                <i class="fa fa-trash"></i> Sil
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">Kayıtlı hizmet bulunamadı.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+</div>

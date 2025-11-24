@@ -1,0 +1,51 @@
+﻿@model IEnumerable<FitnessApp.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Eğitmen Kadromuz";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-5 display-4 text-warning">Uzman Eğitmen Kadromuz</h1>
+    <p class="lead text-center text-muted">Alanında uzman hocalarımızla hedefine emin adımlarla yürü!</p>
+
+    <div class="row g-4 mt-4 justify-content-center">
+        @if (Model.Any())
+        {
+            @foreach (var trainer in Model)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card h-100 shadow-lg text-center border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <!-- Profil Resmi -->
+                            <img src="~/images/@trainer.ImageUrl"
+                                 class="rounded-circle mb-3 border border-warning border-3"
+                                 alt="@trainer.FullName"
+                                 style="width: 150px; height: 150px; object-fit: cover;">
+
+                            <h5 class="card-title mb-1">@trainer.FullName</h5>
+                            <h6 class="card-subtitle mb-3 text-muted">
+                                <span class="badge bg-warning text-dark p-2">@trainer.Specialization Uzmanı</span>
+                            </h6>
+
+                            <!-- Mesai Saatleri -->
+                            <p class="card-text text-secondary mb-3" style="font-size: 0.9em;">
+                                <i class="fa fa-clock"></i> Mesai: <strong>@trainer.WorkStartTime.ToString(@"hh\:mm") - @trainer.WorkEndTime.ToString(@"hh\:mm")</strong>
+                            </p>
+
+                            <!-- Randevu Butonu -->
+                            <a asp-controller="Appointment" asp-action="Booking" class="btn btn-primary w-100 mt-2">
+                                Randevu Al
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <div class="alert alert-danger">Şu anda kayıtlı eğitmenimiz bulunmamaktadır.</div>
+            </div>
+        }
+    </div>
+</div>

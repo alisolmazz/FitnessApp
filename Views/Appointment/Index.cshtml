@@ -1,0 +1,56 @@
+﻿@model IEnumerable<FitnessApp.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Randevularım";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📅 Randevularım</h2>
+        <a asp-action="Booking" class="btn btn-primary">+ Yeni Randevu Al</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <table class="table table-hover table-bordered shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Tarih / Saat</th>
+                    <th>Eğitmen</th>
+                    <th>Hizmet</th>
+                    <th class="text-center">Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.AppointmentDate.ToString("dd.MM.yyyy")</strong> <br />
+                            <small class="text-muted">@item.AppointmentDate.ToString("HH:mm")</small>
+                        </td>
+                        <td>@item.Trainer.FullName</td>
+                        <td>@item.Service.ServiceName</td>
+                        <td class="text-center">
+                            @if (item.IsConfirmed)
+                            {
+                                <span class="badge bg-success p-2">✅ Onaylandı</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-warning text-dark p-2">⏳ Onay Bekliyor</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">
+            Henüz hiç randevunuz yok. Hemen bir tane alın!
+        </div>
+    }
+</div>

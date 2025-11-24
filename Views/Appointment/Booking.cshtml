@@ -1,0 +1,82 @@
+﻿@model FitnessApp.ViewModels.AppointmentBookingViewModel
+
+@{
+    ViewData["Title"] = "Randevu Al";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2><i class="fa fa-calendar-check"></i> Randevu Oluştur</h2>
+                    <p class="mb-0">Hizmet, eğitmen ve saatinizi seçin.</p>
+                </div>
+                <div class="card-body">
+
+                    <form asp-action="Booking" method="post" id="bookingForm">
+
+                        <!-- 1. HİZMET SEÇİMİ -->
+                        <div class="mb-3">
+                            <label asp-for="ServiceId" class="form-label fw-bold">1. Hizmet Paketi</label>
+                            <select asp-for="ServiceId" class="form-select" id="serviceSelect" required>
+                                <option value="">-- Bir Hizmet Seçiniz --</option>
+                                @foreach (var service in Model.Services)
+                                {
+                                    <option value="@service.ServiceId">@service.ServiceName (@service.Price ₺, @service.DurationMinutes dk)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger"></span>
+                        </div>
+
+                        <!-- 2. EĞİTMEN SEÇİMİ -->
+                        <div class="mb-3">
+                            <label asp-for="TrainerId" class="form-label fw-bold">2. Eğitmen</label>
+                            <select asp-for="TrainerId" class="form-select" required>
+                                <option value="">-- Eğitmen Seçiniz --</option>
+                                @foreach (var trainer in Model.Trainers)
+                                {
+                                    <option value="@trainer.TrainerId">@trainer.FullName (@trainer.Specialization)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TrainerId" class="text-danger"></span>
+                        </div>
+
+                        <!-- 3. TARİH VE SAAT -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AppointmentDate" class="form-label fw-bold">Randevu Tarihi</label>
+                                <input asp-for="AppointmentDate" type="date" class="form-control" required />
+                                <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AppointmentTime" class="form-label fw-bold">Randevu Saati</label>
+                                <input asp-for="AppointmentTime" type="time" class="form-control" required />
+                                <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning text-center">
+                            Randevu onayından sonra seçilen hizmetin ücreti tahsil edilecektir.
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 btn-lg">
+                            Randevuyu Onayla
+                        </button>
+                    </form>
+
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger mt-3">@ViewBag.Message</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

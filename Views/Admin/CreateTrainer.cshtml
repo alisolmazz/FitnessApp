@@ -1,0 +1,31 @@
+﻿@model FitnessApp.Models.Trainer
+@{ ViewData["Title"] = "Eğitmen Ekle"; }
+
+<div class="container mt-4">
+    <h2>Yeni Eğitmen Ekle</h2>
+    <form asp-action="CreateTrainer" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label>Ad Soyad</label>
+            <input asp-for="FullName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label>Uzmanlık Alanı (Örn: Fitness, Yoga)</label>
+            <input asp-for="Specialization" class="form-control" required placeholder="Hizmet adıyla eşleşmelidir!" />
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>Mesai Başlangıç</label>
+                <input asp-for="WorkStartTime" type="time" class="form-control" value="09:00" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>Mesai Bitiş</label>
+                <input asp-for="WorkEndTime" type="time" class="form-control" value="17:00" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <label>Profil Resmi</label>
+            <input type="file" name="file" class="form-control" accept="image/*" />
+        </div>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </form>
+</div>

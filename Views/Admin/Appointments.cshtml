@@ -1,0 +1,96 @@
+﻿@model IEnumerable<FitnessApp.Models.Appointment>
+
+@{ ViewData["Title"] = "Randevu Yönetimi"; }
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Randevu Talepleri</h2>
+        <a asp-action="Index" class="btn btn-secondary">Panele Dön</a>
+    </div>
+
+    <div class="alert alert-light border">
+        <small>🔴 Reddedildi | 🟡 Bekliyor | 🟢 Onaylandı</small>
+    </div>
+
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Tarih / Saat</th>
+                <th>Üye</th>
+                <th>Eğitmen</th>
+                <th>Hizmet</th>
+                <th class="text-center">Durum</th>
+                <th class="text-center">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.AppointmentDate.ToString("dd.MM.yyyy")</strong> <br />
+                            <span class="badge bg-light text-dark border">@item.AppointmentDate.ToString("HH:mm")</span>
+                        </td>
+                        <td>
+                            @if (item.AppUser != null)
+                            {
+                                <span>@item.AppUser.FirstName @item.AppUser.LastName</span> <br />
+                                <small class="text-muted">@item.AppUser.Email</small>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Silinmiş Üye</span>
+                            }
+                        </td>
+                        <td>@item.Trainer?.FullName</td>
+                        <td>@item.Service?.ServiceName</td>
+                        
+                        <td class="text-center align-middle">
+                            @if (item.IsRejected)
+                            {
+                                <span class="badge bg-danger p-2">❌ Reddedildi</span>
+                            }
+                            else if (item.IsConfirmed)
+                            {
+                                <span class="badge bg-success p-2">✅ Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark p-2">⏳ Bekliyor</span>
+                            }
+                        </td>
+
+                        <td class="text-center align-middle">
+                            <div class="btn-group">
+                                @if (!item.IsRejected)
+                                {
+                                    @if (!item.IsConfirmed)
+                                    {
+                                        <a asp-action="ApproveAppointment" asp-route-id="@item.AppointmentId" 
+                                           class="btn btn-success btn-sm" title="Onayla">Onayla</a>
+                                    }
+                                    
+                                    <a asp-action="CancelAppointment" asp-route-id="@item.AppointmentId" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('Bu randevuyu reddetmek istediğinize emin misiniz?');">
+                                       Reddet
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted"><small>Sonuçlandı</small></span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center p-4">Kayıt yok.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,78 @@
+﻿@model FitnessApp.ViewModels.AiRequestViewModel
+
+@{
+    ViewData["Title"] = "AI Danışman";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- SOL TARAFTAKİ FORM -->
+        <div class="col-md-4">
+            <div class="card shadow border-info">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fa fa-robot"></i> AI Koçuna Danış</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Yaşınız</label>
+                            <input asp-for="Age" class="form-control" type="number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Boyunuz (cm)</label>
+                            <input asp-for="Height" class="form-control" type="number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kilonuz (kg)</label>
+                            <input asp-for="Weight" class="form-control" type="number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cinsiyet</label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="Erkek">Erkek</option>
+                                <option value="Kadın">Kadın</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hedefiniz Nedir?</label>
+                            <select asp-for="Goal" class="form-select">
+                                <option value="Kilo Vermek & Yağ Yakmak">Kilo Vermek (Yağ Yakımı)</option>
+                                <option value="Kas Kütlesi Kazanmak">Kas Yapmak (Hacim)</option>
+                                <option value="Fit ve Sağlıklı Kalmak">Fit Kalmak</option>
+                                <option value="Kondisyon Arttırmak">Kondisyon Arttırmak</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-info text-white">
+                                ✨ Program Hazırla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ TARAFTAKİ SONUÇ ALANI -->
+        <div class="col-md-8">
+            @if (!string.IsNullOrEmpty(Model.Response))
+            {
+                <div class="card shadow h-100">
+                    <div class="card-header bg-success text-white">
+                        <h4><i class="fa fa-check-circle"></i> Senin İçin Hazırlanan Plan</h4>
+                    </div>
+                    <div class="card-body bg-light">
+                        <!-- Markdown benzeri düzgün formatlama için stil -->
+                        <div style="white-space: pre-wrap; font-family: sans-serif; line-height: 1.6;">@Model.Response</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-secondary text-center mt-5 p-5">
+                    <h3>Merhaba! Ben Yapay Zeka Koçunum. 🤖</h3>
+                    <p>Sol taraftaki formu doldur, sana özel beslenme ve antrenman tüyoları vereyim.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
