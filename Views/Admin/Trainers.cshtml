@@ -1,53 +1,278 @@
 ﻿@model IEnumerable<FitnessApp.Models.Trainer>
 @{
-    ViewData["Title"] = "Eğitmenler";
+    ViewData["Title"] = "Eğitmen Yönetimi";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Eğitmen Listesi</h2>
-        <a asp-action="CreateTrainer" class="btn btn-success">+ Yeni Eğitmen Ekle</a>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    /* --- SAYFA GENELİ (Karanlık Mod) --- */
+    html, body {
+        height: 100%;
+        background-color: #1a1a1d !important;
+        margin: 0;
+        padding: 0;
+        color: #e0e0e0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .page-container {
+        min-height: 100vh;
+        padding-bottom: 50px;
+    }
+
+    /* BAŞLIK ALANI */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 20px;
+    }
+
+    .page-title h2 {
+        font-weight: 800;
+        font-size: 2.2rem;
+        background: linear-gradient(to right, #fff, #aaa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    /* TABLO KARTI */
+    .table-card {
+        background: #25252b;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid #333;
+    }
+
+    /* TABLO TASARIMI */
+    .table-dark-custom {
+        width: 100%;
+        margin-bottom: 0;
+        color: #ccc;
+        background-color: transparent;
+    }
+
+        .table-dark-custom thead th {
+            background-color: #1f1f23;
+            color: #fff;
+            border-bottom: 2px solid #ffc107; /* Eğitmenler için Sarı/Turuncu Neon */
+            padding: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .table-dark-custom tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .table-dark-custom tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+    /* EĞİTMEN RESMİ */
+    .trainer-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #444;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* ROZETLER */
+    .spec-badge {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    /* BUTONLAR */
+    .btn-add-new {
+        background: linear-gradient(45deg, #ffc107, #ff8c00);
+        color: #000;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    }
+
+        .btn-add-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5);
+            color: #000;
+        }
+
+    .btn-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(0, 198, 255, 0.1);
+        color: #00c6ff;
+        border: 1px solid #00c6ff;
+        margin-right: 8px;
+    }
+
+        .btn-edit:hover {
+            background: #00c6ff;
+            color: #000;
+        }
+
+    .btn-delete {
+        background: rgba(255, 77, 77, 0.1);
+        color: #ff4d4d;
+        border: 1px solid #ff4d4d;
+    }
+
+        .btn-delete:hover {
+            background: #ff4d4d;
+            color: #fff;
+        }
+
+    .btn-back {
+        background: #333;
+        color: #ccc;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .btn-back:hover {
+            background: #fff;
+            color: #000;
+        }
+
+</style>
+
+<div class="page-container">
+    <div class="container">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h2>Eğitmen Listesi</h2>
+                <p class="text-muted mb-0">Sisteme kayıtlı antrenörleri yönet.</p>
+            </div>
+            <a asp-action="CreateTrainer" class="btn-add-new">
+                <i class="fa fa-plus me-2"></i> Yeni Eğitmen Ekle
+            </a>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table table-dark-custom">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Resim</th>
+                            <th>Ad Soyad</th>
+                            <th>Uzmanlık</th>
+                            <th>Mesai Saatleri</th>
+                            <th style="width: 150px;" class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="~/images/@item.ImageUrl" class="trainer-avatar" />
+                                    </td>
+                                    <td>
+                                        <strong style="font-size: 1.05rem;">@item.FullName</strong>
+                                    </td>
+                                    <td>
+                                        <span class="spec-badge">@item.Specialization</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-white-50">
+                                            <i class="fa fa-clock me-2 text-warning"></i>
+                                            @item.WorkStartTime.ToString(@"hh\:mm") - @item.WorkEndTime.ToString(@"hh\:mm")
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="EditTrainer" asp-route-id="@item.TrainerId"
+                                           class="btn-icon btn-edit" title="Düzenle">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+
+                                        <a href="javascript:void(0);"
+                                           onclick="confirmDelete('@Url.Action("DeleteTrainer", new { id = item.TrainerId })')"
+                                           class="btn-icon btn-delete" title="Sil">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center p-5 text-muted">
+                                    <i class="fa fa-users-slash fa-3x mb-3"></i><br>
+                                    Kayıtlı eğitmen bulunamadı.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <a asp-action="Index" class="btn-back">
+            <i class="fa fa-arrow-left me-2"></i> Panele Dön
+        </a>
+
     </div>
-    <table class="table table-bordered table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Resim</th>
-                <th>Ad Soyad</th>
-                <th>Uzmanlık</th>
-                <th>Mesai Saatleri</th>
-                <th style="width: 100px;">İşlem</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Any())
-            {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            <img src="~/images/@item.ImageUrl" width="50" height="50" style="object-fit: cover;" class="rounded-circle" />
-                        </td>
-                        <td>@item.FullName</td>
-                        <td><span class="badge bg-info text-dark">@item.Specialization</span></td>
-                        <td>@item.WorkStartTime.ToString(@"hh\:mm") - @item.WorkEndTime.ToString(@"hh\:mm")</td>
-                        <td class="text-center">
-                            <!-- SİLME BUTONU -->
-                            <a asp-action="DeleteTrainer" asp-route-id="@item.TrainerId"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('@item.FullName isimli eğitmeni silmek istediğinize emin misiniz?');">
-                                <i class="fa fa-trash"></i> Sil
-                            </a>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="5" class="text-center">Kayıtlı eğitmen bulunamadı.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
 </div>
+
+<script>
+    function confirmDelete(url) {
+        Swal.fire({
+            title: 'Emin misiniz?',
+            text: "Bu eğitmeni silmek istediğinize emin misiniz? Bu işlem geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4d4d',
+            cancelButtonColor: '#333',
+            confirmButtonText: 'Evet, Sil!',
+            cancelButtonText: 'Vazgeç',
+            background: '#25252b',
+            color: '#fff',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        })
+    }
+</script>

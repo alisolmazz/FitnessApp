@@ -4,90 +4,258 @@
 @inject UserManager<AppUser> UserManager
 
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="h-100">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FitnessApp</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- TEMEL AYARLAR (BEYAZLIĞI GİDEREN KISIM) --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* İçeriğin olduğu alanı genişlet */
+        .content-wrapper {
+            flex: 1 0 auto; /* Bu özellik footer'ı aşağı iter */
+            margin-top: 100px; /* Navbar payı */
+        }
+
+        /* --- NAVBAR TASARIMI --- */
+        .navbar-custom {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #fff !important;
+            letter-spacing: 1px;
+        }
+
+            .navbar-brand i {
+                color: #38ef7d;
+            }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+            .nav-link:hover {
+                color: #38ef7d !important;
+                transform: translateY(-2px);
+            }
+
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: 0;
+                left: 50%;
+                background-color: #38ef7d;
+                transition: all 0.3s;
+                transform: translateX(-50%);
+            }
+
+            .nav-link:hover::after {
+                width: 100%;
+            }
+
+        /* Butonlar */
+        .btn-nav-action {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white !important;
+            border-radius: 25px;
+            padding: 8px 20px !important;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+            border: none;
+        }
+
+            .btn-nav-action:hover {
+                box-shadow: 0 6px 20px rgba(56, 239, 125, 0.5);
+                transform: translateY(-2px) !important;
+                color: white !important;
+            }
+
+            .btn-nav-action::after {
+                display: none;
+            }
+
+        .btn-nav-ai {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Dropdown */
+        .dropdown-menu-dark {
+            background-color: #1f1f1f;
+            border: 1px solid #333;
+        }
+
+        .dropdown-item {
+            color: #ccc;
+            padding: 10px 20px;
+        }
+
+            .dropdown-item:hover {
+                background-color: #333;
+                color: #38ef7d;
+            }
+
+        /* --- FOOTER TASARIMI --- */
+        footer {
+            flex-shrink: 0; /* Footer'ın küçülmesini engelle */
+            background-color: #141414;
+            color: #888;
+            padding: 40px 0 20px 0;
+            margin-top: 50px;
+            width: 100%;
+        }
+
+            footer a {
+                color: #ccc;
+                text-decoration: none;
+                transition: 0.3s;
+            }
+
+                footer a:hover {
+                    color: #38ef7d;
+                }
+
+    </style>
 </head>
 <body>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">FitnessApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="fa fa-dumbbell me-2"></i>FITNESS<span class="text-white-50">APP</span>
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-                    <!-- SOL MENÜ -->
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Hizmetler</a>
+                            <a class="nav-link" asp-controller="Services" asp-action="Index">Hizmetler</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Trainers" asp-action="Index">Eğitmenler</a>
+                            <a class="nav-link" asp-controller="Trainers" asp-action="Index">Eğitmenler</a>
                         </li>
-
-                        @if (SignInManager.IsSignedIn(User))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-primary fw-bold" asp-controller="Appointment" asp-action="Index">📅 Randevu Al</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-info fw-bold" asp-controller="Ai" asp-action="Index">🤖 AI Danışman</a>
-                            </li>
-                        }
                     </ul>
 
-                    <!-- SAĞ MENÜ -->
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav align-items-center">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                    Merhaba, @UserManager.GetUserName(User)
+                            <li class="nav-item me-2">
+                                <a class="nav-link btn-nav-action" asp-controller="Appointment" asp-action="Booking">
+                                    <i class="fa fa-calendar-check me-1"></i> Randevu Al
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                            </li>
+                            <li class="nav-item me-3">
+                                <a class="nav-link btn-nav-action btn-nav-ai" asp-controller="Ai" asp-action="Index">
+                                    <i class="fa fa-robot me-1"></i> AI Koç
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <div class="bg-white text-dark rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px; font-weight:bold;">
+                                        @User.Identity.Name.Substring(0, 1).ToUpper()
+                                    </div>
+                                    <span class="small text-white">Hesabım</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+                                    <li><div class="dropdown-header text-white-50">@User.Identity.Name</div></li>
+                                    <li><hr class="dropdown-divider bg-secondary"></li>
                                     @if (User.IsInRole("Admin"))
                                     {
-                                        <li>
-                                            <a class="dropdown-item text-danger fw-bold" asp-controller="Admin" asp-action="Index">⚙️ Admin Paneli</a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger fw-bold" asp-controller="Admin" asp-action="Index"><i class="fa fa-cogs me-2"></i> Yönetim Paneli</a></li>
                                     }
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">Çıkış Yap</a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-controller="Appointment" asp-action="Index"><i class="fa fa-list-alt me-2"></i> Randevularım</a></li>
+                                    <li><hr class="dropdown-divider bg-secondary"></li>
+                                    <li><a class="dropdown-item text-warning" asp-controller="Account" asp-action="Logout"><i class="fa fa-sign-out-alt me-2"></i> Çıkış Yap</a></li>
                                 </ul>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-primary" asp-controller="Account" asp-action="Login">Giriş Yap</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-success" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Giriş Yap</a></li>
+                            <li class="nav-item ms-2"><a class="nav-link btn-nav-action" asp-controller="Account" asp-action="Register">Kayıt Ol</a></li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container content-wrapper">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+    <footer class="mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3"><i class="fa fa-dumbbell me-2"></i>FITNESSAPP</h5>
+                    <p class="small">Sporu hayatının bir parçası yap. Uzman eğitmenler ve yapay zeka destekli programlarla hedefine ulaş.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Hızlı Linkler</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/Home/Index">Ana Sayfa</a></li>
+                        <li><a href="/Services/Index">Hizmetlerimiz</a></li>
+                        <li><a href="/Trainers/Index">Eğitmen Kadrosu</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">İletişim</h5>
+                    <p class="small mb-1"><i class="fa fa-map-marker-alt me-2"></i> Sakarya Üniversitesi, Teknokent</p>
+                    <p class="small mb-1"><i class="fa fa-phone me-2"></i> +90 551 199 7332</p>
+                    <p class="small"><i class="fa fa-envelope me-2"></i> ali.solmaz@ogr.sakarya.edu.tr</p>
+                    <div class="mt-3">
+                        <a href="https://www.instagram.com/alisolmz_/" target="_blank" class="me-3 fs-5 text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="me-3 fs-5 text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="fs-5 text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-3 text-center small mt-3">
+                &copy; 2024 FitnessApp - Tüm Hakları Saklıdır. | Ali Solmaz
+            </div>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

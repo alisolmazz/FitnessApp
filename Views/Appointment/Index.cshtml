@@ -4,53 +4,412 @@
     ViewData["Title"] = "Randevularım";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>📅 Randevularım</h2>
-        <a asp-action="Booking" class="btn btn-primary">+ Yeni Randevu Al</a>
-    </div>
-
-    @if (Model.Any())
-    {
-        <table class="table table-hover table-bordered shadow-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Tarih / Saat</th>
-                    <th>Eğitmen</th>
-                    <th>Hizmet</th>
-                    <th class="text-center">Durum</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            <strong>@item.AppointmentDate.ToString("dd.MM.yyyy")</strong> <br />
-                            <small class="text-muted">@item.AppointmentDate.ToString("HH:mm")</small>
-                        </td>
-                        <td>@item.Trainer.FullName</td>
-                        <td>@item.Service.ServiceName</td>
-                        <td class="text-center">
-                            @if (item.IsConfirmed)
-                            {
-                                <span class="badge bg-success p-2">✅ Onaylandı</span>
-                            }
-                            else
-                            {
-
-                                <span class="badge bg-warning text-dark p-2">⏳ Onay Bekliyor</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<style>
+    /* --- GENEL SAYFA AYARLARI --- */
+    html, body {
+        height: 100%;
+        background-color: #1a1a1d !important; /* Koyu Zemin */
+        margin: 0;
+        color: #fff;
+        font-family: 'Poppins', sans-serif;
     }
-    else
-    {
-        <div class="alert alert-warning text-center">
-            Henüz hiç randevunuz yok. Hemen bir tane alın!
+
+    .page-container {
+        min-height: 100vh;
+        padding-bottom: 50px;
+    }
+
+    /* BAŞLIK ALANI */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 60px;
+        margin-bottom: 40px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 20px;
+    }
+
+    .page-title h2 {
+        font-weight: 800;
+        font-size: 2.5rem;
+        background: linear-gradient(to right, #fff, #bbb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    .page-title p {
+        color: #777;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    /* RANDEVU KARTI TASARIMI */
+    .appointment-card {
+        background: rgba(30, 30, 35, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .appointment-card:hover {
+            transform: translateX(5px); /* Sağa doğru hafif kayma efekti */
+            border-color: #38ef7d;
+            background: rgba(40, 40, 45, 0.9);
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.3);
+        }
+
+    /* TARİH KUTUSU (SOL TARAFTAKİ KARE) */
+    .date-box {
+        background: linear-gradient(135deg, #38ef7d, #11998e);
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-weight: bold;
+        margin-right: 25px;
+        flex-shrink: 0;
+        box-shadow: 0 5px 15px rgba(56, 239, 125, 0.3);
+    }
+
+        /* Geçmiş Tarih Rengi */
+        .date-box.past {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            box-shadow: none;
+            color: #ccc;
+        }
+
+    .date-day {
+        font-size: 1.8rem;
+        line-height: 1;
+    }
+
+    .date-month {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    /* İÇERİK BİLGİLERİ */
+    .info-box {
+        flex-grow: 1;
+    }
+
+    .trainer-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .trainer-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover;
+        border: 1px solid #fff;
+    }
+
+    .service-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0;
+    }
+
+    .time-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.1);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: #ccc;
+        margin-top: 5px;
+    }
+
+    /* AKSİYONLAR (SAĞ TARAF) */
+    .actions-box {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        gap: 10px;
+        min-width: 140px;
+    }
+
+    /* DURUM ETİKETLERİ */
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+
+    .status-confirmed {
+        background: rgba(40, 167, 69, 0.2);
+        color: #38ef7d;
+        border: 1px solid #38ef7d;
+    }
+
+    .status-rejected {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff4d4d;
+        border: 1px solid #ff4d4d;
+    }
+
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+
+    .status-past {
+        background: rgba(108, 117, 125, 0.2);
+        color: #adb5bd;
+        border: 1px solid #adb5bd;
+    }
+
+    /* BUTONLAR */
+    .btn-action-cancel {
+        background: transparent;
+        color: #ff4d4d;
+        border: 1px solid #ff4d4d;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-action-cancel:hover {
+            background: #ff4d4d;
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+        }
+
+    .btn-action-rebook {
+        background: transparent;
+        color: #00c6ff;
+        border: 1px solid #00c6ff;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-action-rebook:hover {
+            background: #00c6ff;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+        }
+
+    /* BOŞ DURUM (EMPTY STATE) */
+    .empty-state {
+        text-align: center;
+        padding: 80px 0;
+        opacity: 0.7;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        color: #333;
+        margin-bottom: 20px;
+        text-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+
+    /* YENİ RANDEVU BUTONU */
+    .btn-new-app {
+        background: #38ef7d;
+        color: #000;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+        .btn-new-app:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+</style>
+
+<div class="page-container">
+    <div class="container">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success bg-transparent border-success text-success mt-4 rounded-3">
+                <i class="fa fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger bg-transparent border-danger text-danger mt-4 rounded-3">
+                <i class="fa fa-times-circle me-2"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="page-header">
+            <div class="page-title">
+                <h2>Randevularım</h2>
+                <p>Geçmiş ve gelecek antrenman planların.</p>
+            </div>
+            <a asp-action="Booking" class="btn-new-app">
+                <i class="fa fa-plus me-2"></i> Yeni Randevu
+            </a>
         </div>
-    }
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    @foreach (var item in Model)
+                    {
+                        // Geçmiş kontrolü
+                        bool isPast = item.AppointmentDate < DateTime.Now;
+
+                        <div class="appointment-card" style="@(item.IsRejected ? "opacity:0.6;" : "")">
+
+                            <div class="date-box @(isPast || item.IsRejected ? "past" : "")">
+                                <span class="date-day">@item.AppointmentDate.Day</span>
+                                <span class="date-month">@item.AppointmentDate.ToString("MMM")</span>
+                            </div>
+
+                            <div class="info-box">
+                                <h4 class="service-name">@item.Service.ServiceName</h4>
+
+                                <div class="trainer-info mt-2">
+                                    <img src="~/images/@item.Trainer.ImageUrl" class="trainer-avatar" />
+                                    <span class="text-white-50 small">Eğitmen: </span>
+                                    <span class="ms-1 fw-bold">@item.Trainer.FullName</span>
+                                </div>
+
+                                <div class="time-badge">
+                                    <i class="fa fa-clock me-1 text-warning"></i> @item.AppointmentDate.ToString("HH:mm")
+                                    @if (isPast)
+                                    {
+                                        <span class="ms-2 text-white-50 small">(Geçmiş)</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="actions-box">
+
+                                @if (item.IsRejected)
+                                {
+                                    <span class="status-badge status-rejected">İptal Edildi</span>
+                                }
+                                else if (isPast)
+                                {
+                                    <span class="status-badge status-past">Tamamlandı</span>
+                                }
+                                else if (item.IsConfirmed)
+                                {
+                                    <span class="status-badge status-confirmed">Onaylandı</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-pending">Bekliyor</span>
+                                }
+
+                                @if (!isPast && !item.IsRejected)
+                                {
+                                    /* Gelecek Randevu -> İPTAL ET (SweetAlert ile) */
+                                    <form asp-action="CancelAppointment" method="post">
+                                        <input type="hidden" name="id" value="@item.AppointmentId" />
+
+                                        <button type="button" class="btn-action-cancel" onclick="confirmCancel(this)">
+                                            <i class="fa fa-times me-1"></i> İptal Et
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    /* Geçmiş/İptal -> TEKRARLA */
+                                    <a asp-action="Booking" asp-route-trainerId="@item.TrainerId" class="btn-action-rebook">
+                                        <i class="fa fa-redo me-1"></i> Tekrarla
+                                    </a>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fa fa-calendar-times"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Henüz bir planın yok.</h3>
+                <p class="text-muted mb-4">Kendine bir iyilik yap ve ilk antrenmanını planla.</p>
+
+                <a asp-action="Booking" class="btn btn-outline-light rounded-pill px-4 py-2">
+                    Hemen Başla
+                </a>
+            </div>
+        }
+
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmCancel(btn) {
+        // Butonun içinde bulunduğu formu bul
+        var form = btn.closest('form');
+
+        // SweetAlert Penceresini Aç
+        Swal.fire({
+            title: 'Emin misiniz?',
+            text: "Bu randevuyu iptal etmek üzeresiniz. Bu işlem geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4d4d', // Kırmızı
+            cancelButtonColor: '#333',     // Koyu Gri
+            confirmButtonText: 'Evet, İptal Et!',
+            cancelButtonText: 'Vazgeç',
+            background: '#25252b',         // Koyu Arka Plan
+            color: '#fff',                 // Beyaz Yazı
+            iconColor: '#ff4d4d',          // Kırmızı Ünlem
+            reverseButtons: true,
+
+            // Animasyon ve Gölgelendirme Sınıfları
+            customClass: {
+                popup: 'shadow-lg border border-secondary rounded-4'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Kullanıcı onayladıysa formu gönder
+                form.submit();
+            }
+        });
+    }
+</script>

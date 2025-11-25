@@ -2,42 +2,189 @@
 
 @{
     ViewData["Title"] = "Kayıt Ol";
+    Layout = null; // Tam ekran tasarım için
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white text-center">
-                <h3>Kayıt Ol</h3>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kayıt Ol - FitnessApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        body {
+            /* Giriş sayfasıyla aynı arkaplan, bütünlük sağlar */
+            background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Biraz daha koyu, yazı okunsun */
+            z-index: 1;
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px; /* Girişten biraz daha geniş */
+            position: relative;
+            z-index: 2;
+        }
+
+            .register-card h2 {
+                font-weight: 800;
+                letter-spacing: 1px;
+                margin-bottom: 5px;
+            }
+
+        /* Inputlar */
+        .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 20px;
+            padding-left: 45px;
+            height: 50px;
+            font-size: 0.95rem;
+        }
+
+            .form-control:focus {
+                background: #fff;
+                box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); /* Yeşil gölge */
+            }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #198754; /* Yeşil ikon */
+            z-index: 10;
+        }
+
+        /* Yeşil Gradient Buton */
+        .btn-register {
+            background: linear-gradient(45deg, #11998e, #38ef7d); /* Modern Yeşil */
+            border: none;
+            border-radius: 30px;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+        }
+
+            .btn-register:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(56, 239, 125, 0.6);
+                color: white;
+            }
+
+        .auth-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+
+            .auth-link:hover {
+                color: #38ef7d;
+                text-decoration: underline;
+            }
+
+        .brand-logo {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #38ef7d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="container h-100 d-flex justify-content-center align-items-center">
+        <div class="register-card text-center">
+
+            <div class="brand-logo">
+                <i class="fa fa-user-plus"></i>
             </div>
-            <div class="card-body">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label>Ad</label>
-                            <input asp-for="FirstName" class="form-control" />
+
+            <h2>ARAMIZA KATIL</h2>
+            <p class="text-white-50 mb-4">Spor dolu hayata ilk adımını at!</p>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <i class="fa fa-user input-icon"></i>
+                            <input asp-for="FirstName" class="form-control" placeholder="Ad" />
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Soyad</label>
-                            <input asp-for="LastName" class="form-control" />
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <i class="fa fa-user input-icon"></i>
+                            <input asp-for="LastName" class="form-control" placeholder="Soyad" />
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <input asp-for="Email" class="form-control" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Şifre</label>
-                        <input asp-for="Password" class="form-control" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Şifre Tekrar</label>
-                        <input asp-for="ConfirmPassword" class="form-control" />
-                    </div>
-                    <button type="submit" class="btn btn-success w-100">Kayıt Ol</button>
-                </form>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa fa-envelope input-icon"></i>
+                    <input asp-for="Email" class="form-control" placeholder="Email Adresi" />
+                </div>
+                <span asp-validation-for="Email" class="text-warning small d-block text-start mb-2"></span>
+
+                <div class="input-group">
+                    <i class="fa fa-lock input-icon"></i>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Şifre" />
+                </div>
+                <span asp-validation-for="Password" class="text-warning small d-block text-start mb-2"></span>
+
+                <div class="input-group">
+                    <i class="fa fa-key input-icon"></i>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Şifre Tekrar" />
+                </div>
+
+                <button type="submit" class="btn btn-register">
+                    KAYIT OL <i class="fa fa-check-circle ms-2"></i>
+                </button>
+            </form>
+
+            <div class="mt-4">
+                <p class="mb-0">Zaten hesabın var mı?</p>
+                <a asp-action="Login" class="auth-link fw-bold">Giriş Yap</a>
             </div>
         </div>
     </div>
-</div>
+
+</body>
+</html>

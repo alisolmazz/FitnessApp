@@ -1,0 +1,96 @@
+﻿@model FitnessApp.Models.Trainer
+@{
+    ViewData["Title"] = "Eğitmen Düzenle";
+}
+
+<style>
+    body {
+        background-color: #1a1a1d;
+        color: #fff;
+    }
+
+    .form-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-control {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #444;
+        color: #fff;
+    }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border-color: #00c6ff;
+            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+        }
+
+    label {
+        margin-bottom: 8px;
+        color: #ccc;
+        font-weight: 500;
+    }
+
+    .current-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #00c6ff;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 fw-bold" style="color: #00c6ff;">Eğitmeni Düzenle</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-card shadow-lg">
+                <form asp-action="EditTrainer" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="TrainerId" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-12 text-center">
+                            <label>Mevcut Profil</label><br />
+                            <img src="~/images/@Model.ImageUrl" class="current-img" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Ad Soyad</label>
+                        <input asp-for="FullName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Uzmanlık Alanı</label>
+                        <input asp-for="Specialization" class="form-control" required />
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Mesai Başlangıç</label>
+                            <input asp-for="WorkStartTime" type="time" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Mesai Bitiş</label>
+                            <input asp-for="WorkEndTime" type="time" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label>Yeni Resim (Opsiyonel)</label>
+                        <input type="file" name="file" class="form-control" accept="image/*" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #00c6ff; border:none;">Kaydet ve Güncelle</button>
+                        <a asp-action="Trainers" class="btn btn-outline-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

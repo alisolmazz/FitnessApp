@@ -4,27 +4,241 @@
     ViewData["Title"] = "AI Danışman";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <!-- SOL TARAFTAKİ FORM -->
-        <div class="col-md-4">
-            <div class="card shadow border-info">
-                <div class="card-header bg-info text-white">
-                    <h4><i class="fa fa-robot"></i> AI Koçuna Danış</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Index" method="post">
+<style>
+    /* --- SAYFA GENELİ --- */
+    html {
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)), url('[https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop](https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop)');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    body {
+        background-color: transparent !important;
+        color: #fff;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+    }
+
+    .ai-page-container {
+        min-height: 100vh;
+        padding: 50px 0;
+    }
+
+    /* FORM KARTI */
+    .ai-form-card {
+        background: rgba(20, 20, 25, 0.9);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 30px rgba(0, 242, 254, 0.1);
+        height: 100%;
+    }
+
+    .ai-header h2 {
+        font-weight: 800;
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .ai-header i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #00f2fe;
+    }
+
+    /* INPUTLAR VE DROPDOWN DÜZELTMESİ (KRİTİK) */
+    .form-label {
+        color: #00f2fe;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+        }
+
+    select option { /* DROPDOWN FIX */
+        background-color: #1a1a1d;
+        color: #fff;
+    }
+
+    .btn-generate {
+        background: linear-gradient(90deg, #00c6ff, #0072ff);
+        border: none;
+        color: white;
+        width: 100%;
+        padding: 15px;
+        border-radius: 30px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+        margin-top: 20px;
+        box-shadow: 0 5px 20px rgba(0, 198, 255, 0.4);
+    }
+
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 198, 255, 0.6);
+            color: #fff;
+        }
+
+    /* --- YENİ KUTU TASARIMLARI (AI ÇIKTISI) --- */
+    .ai-box {
+        border-radius: 15px;
+        overflow: hidden;
+        height: 100%;
+        transition: all 0.3s ease;
+        background: rgba(30, 30, 35, 0.8);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+        .ai-box:hover {
+            transform: translateY(-5px);
+        }
+
+    .box-header {
+        padding: 15px;
+        font-weight: 800;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+    }
+
+        .box-header i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+
+    .box-content {
+        padding: 20px;
+        font-size: 0.95rem;
+        color: #ddd;
+        line-height: 1.7;
+    }
+
+        .box-content ul {
+            padding-left: 20px;
+            margin: 0;
+            list-style: none;
+        }
+
+        .box-content li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+            .box-content li::before {
+                content: '•';
+                position: absolute;
+                left: 0;
+                color: #38ef7d;
+                font-size: 1.5em;
+                line-height: 0.6;
+            }
+
+    /* BESLENME KUTUSU ÖZEL */
+    .nutrition-box {
+        border-color: #ffc107;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+    }
+
+        .nutrition-box .box-header {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border-bottom: 1px solid #ffc107;
+        }
+
+        .nutrition-box .box-content li::before {
+            content: '🍎';
+        }
+
+    /* ANTRENMAN KUTUSU ÖZEL */
+    .workout-box {
+        border-color: #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+
+        .workout-box .box-header {
+            background: rgba(0, 242, 254, 0.15);
+            color: #00f2fe;
+            border-bottom: 1px solid #00f2fe;
+        }
+
+        .workout-box .box-content li::before {
+            content: '⚡';
+        }
+
+    /* LOADING */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.85);
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+</style>
+
+<div class="loading-overlay" id="loadingBox">
+    <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+    <h4 class="mt-3 text-white">Program Hazırlanıyor...</h4>
+</div>
+
+<div class="ai-page-container d-flex align-items-center">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-lg-4">
+                <div class="ai-form-card">
+                    <div class="ai-header text-center mb-4">
+                        <i class="fa fa-robot"></i>
+                        <h2>AI KOÇ</h2>
+                        <p class="text-white-50 small">Kişisel programını oluştur.</p>
+                    </div>
+
+                    <form asp-action="Index" method="post" id="aiForm">
                         <div class="mb-3">
                             <label class="form-label">Yaşınız</label>
-                            <input asp-for="Age" class="form-control" type="number" required />
+                            <input asp-for="Age" class="form-control" type="number" placeholder="Örn: 25" required />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Boyunuz (cm)</label>
-                            <input asp-for="Height" class="form-control" type="number" required />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kilonuz (kg)</label>
-                            <input asp-for="Weight" class="form-control" type="number" required />
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Boy (cm)</label>
+                                <input asp-for="Height" class="form-control" type="number" placeholder="180" required />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Kilo (kg)</label>
+                                <input asp-for="Weight" class="form-control" type="number" placeholder="75" required />
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Cinsiyet</label>
@@ -34,45 +248,58 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Hedefiniz Nedir?</label>
+                            <label class="form-label">Hedefiniz</label>
                             <select asp-for="Goal" class="form-select">
-                                <option value="Kilo Vermek & Yağ Yakmak">Kilo Vermek (Yağ Yakımı)</option>
-                                <option value="Kas Kütlesi Kazanmak">Kas Yapmak (Hacim)</option>
-                                <option value="Fit ve Sağlıklı Kalmak">Fit Kalmak</option>
-                                <option value="Kondisyon Arttırmak">Kondisyon Arttırmak</option>
+                                <option value="Kilo Vermek">Kilo Vermek (Yağ Yakımı)</option>
+                                <option value="Kas Yapmak">Kas Yapmak (Hacim)</option>
+                                <option value="Fit Kalmak">Fit ve Sağlıklı Kalmak</option>
+                                <option value="Kondisyon">Kondisyon Arttırmak</option>
                             </select>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-info text-white">
-                                ✨ Program Hazırla
-                            </button>
-                        </div>
+
+                        <button type="submit" class="btn-generate" id="btnGenerate">
+                            <i class="fa fa-magic me-2"></i> Program Hazırla
+                        </button>
                     </form>
                 </div>
             </div>
-        </div>
 
-        <!-- SAĞ TARAFTAKİ SONUÇ ALANI -->
-        <div class="col-md-8">
-            @if (!string.IsNullOrEmpty(Model.Response))
-            {
-                <div class="card shadow h-100">
-                    <div class="card-header bg-success text-white">
-                        <h4><i class="fa fa-check-circle"></i> Senin İçin Hazırlanan Plan</h4>
+            <div class="col-lg-8">
+                @if (!string.IsNullOrEmpty(Model.Response))
+                {
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                            <div class="terminal-title">Analiz Sonucu: Kişisel Programınız</div>
+                        </div>
+
+                        <div class="result-body p-0" id="resultBody">
+
+                            @Html.Raw(Model.Response)
+
+                        </div>
                     </div>
-                    <div class="card-body bg-light">
-                        <!-- Markdown benzeri düzgün formatlama için stil -->
-                        <div style="white-space: pre-wrap; font-family: sans-serif; line-height: 1.6;">@Model.Response</div>
+                }
+                else
+                {
+                    <div class="result-card d-flex align-items-center justify-content-center">
+                        <div class="text-center empty-state" style="opacity: 1;">
+                            <i class="fa fa-brain fa-5x mb-3" style="color: #00f2fe;"></i>
+                            <h3>Yapay Zeka Asistanı Hazır</h3>
+                            <p class="text-white-50">Sol taraftaki formu doldurarak sana özel özet programı alabilirsin.</p>
+                        </div>
                     </div>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-secondary text-center mt-5 p-5">
-                    <h3>Merhaba! Ben Yapay Zeka Koçunum. 🤖</h3>
-                    <p>Sol taraftaki formu doldur, sana özel beslenme ve antrenman tüyoları vereyim.</p>
-                </div>
-            }
+                }
+            </div>
+
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('aiForm')?.addEventListener('submit', function () {
+        document.getElementById('loadingBox').style.display = 'flex';
+        document.getElementById('btnGenerate').disabled = true;
+        document.getElementById('btnGenerate').innerHTML = '<i class="fa fa-spinner fa-spin"></i> Bekleyiniz...';
+    });
+</script>

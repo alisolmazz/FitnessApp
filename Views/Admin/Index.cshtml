@@ -1,43 +1,242 @@
 ﻿@{
-    ViewData["Title"] = "Admin Paneli";
+    ViewData["Title"] = "Yönetim Paneli";
 }
 
-<div class="container mt-4">
-    <h1 class="text-center mb-5">Yönetim Paneli</h1>
+<style>
+    /* --- SAYFA GENELİ --- */
+    html, body {
+        height: 100%;
+        /* Diğer sayfalarla uyumlu, hafif karartılmış spor salonu arka planı */
+        background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        font-family: 'Poppins', sans-serif;
+    }
 
-    <div class="row text-center">
-        <!-- Hizmetler -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 border-primary">
-                <div class="card-body">
-                    <h3 class="card-title text-primary"><i class="fa fa-dumbbell"></i> Hizmetler</h3>
-                    <p>Spor salonu hizmetlerini ve fiyatlarını yönet.</p>
-                    <a asp-action="Services" class="btn btn-primary w-100">Hizmetleri Yönet</a>
-                </div>
-            </div>
+    .dashboard-container {
+        padding-top: 80px;
+        padding-bottom: 50px;
+        min-height: 100vh;
+    }
+
+    /* BAŞLIK */
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+        .dashboard-header h1 {
+            font-weight: 800;
+            font-size: 3.5rem;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .dashboard-header p {
+            color: #bbb;
+            font-size: 1.2rem;
+        }
+
+    /* KART TASARIMI */
+    .admin-card {
+        background: rgba(30, 30, 35, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 25px;
+        padding: 40px 30px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(15px);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Hover Efektleri (Her kart için ayrı renk) */
+    .card-services:hover {
+        transform: translateY(-10px);
+        border-color: #00c6ff;
+        box-shadow: 0 10px 30px rgba(0, 198, 255, 0.2);
+    }
+
+    .card-trainers:hover {
+        transform: translateY(-10px);
+        border-color: #ffc107;
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
+    }
+
+    .card-appointments:hover {
+        transform: translateY(-10px);
+        border-color: #38ef7d;
+        box-shadow: 0 10px 30px rgba(56, 239, 125, 0.2);
+    }
+
+    /* İKON KUTUSU */
+    .icon-box {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.4s;
+    }
+
+    .card-services .icon-box {
+        color: #00c6ff;
+    }
+
+    .card-trainers .icon-box {
+        color: #ffc107;
+    }
+
+    .card-appointments .icon-box {
+        color: #38ef7d;
+    }
+
+    /* Kart Hover Olunca İkon Parlasın */
+    .card-services:hover .icon-box {
+        background: #00c6ff;
+        color: #000;
+        box-shadow: 0 0 20px #00c6ff;
+    }
+
+    .card-trainers:hover .icon-box {
+        background: #ffc107;
+        color: #000;
+        box-shadow: 0 0 20px #ffc107;
+    }
+
+    .card-appointments:hover .icon-box {
+        background: #38ef7d;
+        color: #000;
+        box-shadow: 0 0 20px #38ef7d;
+    }
+
+    /* METİNLER */
+    .admin-card h3 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+
+    .admin-card p {
+        color: #aaa;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    /* BUTONLAR */
+    .btn-dashboard {
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.3s;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .btn-services {
+        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        color: #fff;
+    }
+
+        .btn-services:hover {
+            box-shadow: 0 5px 20px rgba(0, 198, 255, 0.4);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+    .btn-trainers {
+        background: linear-gradient(45deg, #ffc107, #ff8c00);
+        color: #000;
+    }
+
+        .btn-trainers:hover {
+            box-shadow: 0 5px 20px rgba(255, 193, 7, 0.4);
+            color: #000;
+            transform: scale(1.05);
+        }
+
+    .btn-appointments {
+        background: linear-gradient(45deg, #38ef7d, #11998e);
+        color: #000;
+    }
+
+        .btn-appointments:hover {
+            box-shadow: 0 5px 20px rgba(56, 239, 125, 0.4);
+            color: #000;
+            transform: scale(1.05);
+        }
+
+</style>
+
+<div class="dashboard-container">
+    <div class="container">
+
+        <div class="dashboard-header">
+            <h1>Yönetim Paneli</h1>
+            <p>Spor salonunun kontrol merkezi. Tüm işlemleri buradan yönetin.</p>
         </div>
 
-        <!-- Eğitmenler -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 border-warning">
-                <div class="card-body">
-                    <h3 class="card-title text-warning"><i class="fa fa-user-ninja"></i> Eğitmenler</h3>
-                    <p>Antrenörleri ve çalışma saatlerini yönet.</p>
-                    <a asp-action="Trainers" class="btn btn-warning w-100">Eğitmenleri Yönet</a>
-                </div>
-            </div>
-        </div>
+        <div class="row g-4">
 
-        <!-- RANDEVULAR (Link Güncellendi) -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 border-success">
-                <div class="card-body">
-                    <h3 class="card-title text-success"><i class="fa fa-calendar-check"></i> Randevular</h3>
-                    <p>Üye taleplerini onayla veya reddet.</p>
-                    <!-- BURASI -->
-                    <a asp-action="Appointments" class="btn btn-success w-100">Talepleri Yönet</a>
+            <div class="col-md-4">
+                <div class="admin-card card-services">
+                    <div class="icon-box">
+                        <i class="fa fa-dumbbell"></i>
+                    </div>
+                    <h3>Hizmetler</h3>
+                    <p>Spor salonu hizmetlerini, fiyatlarını ve sürelerini düzenleyin.</p>
+                    <a asp-action="Services" class="btn-dashboard btn-services">
+                        Yönet <i class="fa fa-arrow-right ms-2"></i>
+                    </a>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="admin-card card-trainers">
+                    <div class="icon-box">
+                        <i class="fa fa-user-ninja"></i>
+                    </div>
+                    <h3>Eğitmenler</h3>
+                    <p>Antrenör kadrosunu, uzmanlık alanlarını ve çalışma saatlerini yönetin.</p>
+                    <a asp-action="Trainers" class="btn-dashboard btn-trainers">
+                        Yönet <i class="fa fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="admin-card card-appointments">
+                    <div class="icon-box">
+                        <i class="fa fa-calendar-check"></i>
+                    </div>
+                    <h3>Randevular</h3>
+                    <p>Üyelerden gelen randevu taleplerini görüntüleyin, onaylayın veya reddedin.</p>
+                    <a asp-action="Appointments" class="btn-dashboard btn-appointments">
+                        Yönet <i class="fa fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

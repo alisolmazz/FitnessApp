@@ -1,96 +1,362 @@
 ﻿@model IEnumerable<FitnessApp.Models.Appointment>
 
-@{ ViewData["Title"] = "Randevu Yönetimi"; }
+@{
+    ViewData["Title"] = "Randevu Talepleri";
+}
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Randevu Talepleri</h2>
-        <a asp-action="Index" class="btn btn-secondary">Panele Dön</a>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    /* --- SAYFA GENELİ (Karanlık Mod) --- */
+    html, body {
+        height: 100%;
+        background-color: #1a1a1d !important;
+        margin: 0;
+        padding: 0;
+        color: #e0e0e0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .page-container {
+        min-height: 100vh;
+        padding-bottom: 50px;
+    }
+
+    /* BAŞLIK ALANI */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 20px;
+    }
+
+    .page-title h2 {
+        font-weight: 800;
+        font-size: 2.2rem;
+        background: linear-gradient(to right, #fff, #aaa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    /* TABLO KARTI */
+    .table-card {
+        background: #25252b;
+        border-radius: 20px;
+        overflow: hidden; /* Köşeleri yuvarlat */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid #333;
+    }
+
+    /* TABLO TASARIMI */
+    .table-dark-custom {
+        width: 100%;
+        margin-bottom: 0;
+        color: #ccc;
+        background-color: transparent;
+    }
+
+        .table-dark-custom thead th {
+            background-color: #1f1f23;
+            color: #fff;
+            border-bottom: 2px solid #38ef7d; /* Neon Yeşil Çizgi */
+            padding: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .table-dark-custom tbody td {
+            padding: 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .table-dark-custom tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+    /* KULLANICI BİLGİSİ */
+    .user-info strong {
+        display: block;
+        color: #fff;
+        font-size: 1.05rem;
+    }
+
+    .user-info span {
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    /* TARİH ROZETİ */
+    .date-badge {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 8px 12px;
+        border-radius: 10px;
+        text-align: center;
+        min-width: 100px;
+    }
+
+        .date-badge div {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .date-badge small {
+            color: #38ef7d;
+            font-weight: 600;
+        }
+
+    /* DURUM ROZETLERİ */
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+        width: 110px;
+        text-align: center;
+    }
+
+    .status-confirmed {
+        background: rgba(40, 167, 69, 0.2);
+        color: #38ef7d;
+        border: 1px solid #38ef7d;
+    }
+
+    .status-rejected {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff4d4d;
+        border: 1px solid #ff4d4d;
+    }
+
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+
+    /* BUTONLAR */
+    .btn-action {
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-approve {
+        background: #38ef7d;
+        color: #000;
+        box-shadow: 0 4px 10px rgba(56, 239, 125, 0.2);
+    }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(56, 239, 125, 0.4);
+            color: #000;
+        }
+
+    .btn-reject {
+        background: rgba(255, 77, 77, 0.1);
+        color: #ff4d4d;
+        border: 1px solid #ff4d4d;
+    }
+
+        .btn-reject:hover {
+            background: #ff4d4d;
+            color: #fff;
+        }
+
+    .btn-back {
+        background: #333;
+        color: #ccc;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .btn-back:hover {
+            background: #fff;
+            color: #000;
+        }
+
+</style>
+
+<div class="page-container">
+    <div class="container">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h2>Randevu Talepleri</h2>
+                <p class="text-muted">Tüm üye başvurularını buradan yönetebilirsiniz.</p>
+            </div>
+            <a asp-action="Index" class="btn-back">
+                <i class="fa fa-arrow-left me-2"></i> Panele Dön
+            </a>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table table-dark-custom">
+                    <thead>
+                        <tr>
+                            <th>Tarih / Saat</th>
+                            <th>Üye Bilgisi</th>
+                            <th>Eğitmen</th>
+                            <th>Hizmet</th>
+                            <th class="text-center">Durum</th>
+                            <th class="text-center" style="min-width: 180px;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="date-badge">
+                                            <div>@item.AppointmentDate.ToString("dd.MM.yyyy")</div>
+                                            <small>@item.AppointmentDate.ToString("HH:mm")</small>
+                                        </div>
+                                    </td>
+
+                                    <td class="user-info">
+                                        @if (item.AppUser != null)
+                                        {
+                                            <strong>@item.AppUser.FirstName @item.AppUser.LastName</strong>
+                                            <span>@item.AppUser.Email</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Silinmiş Üye</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="~/images/@item.Trainer?.ImageUrl" class="rounded-circle me-2" width="30" height="30" style="object-fit:cover; border:1px solid #555;">
+                                            <span>@item.Trainer?.FullName</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-white">@item.Service?.ServiceName</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        @if (item.IsRejected)
+                                        {
+                                            <span class="status-badge status-rejected">Reddedildi</span>
+                                        }
+                                        else if (item.IsConfirmed)
+                                        {
+                                            <span class="status-badge status-confirmed">Onaylandı</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-pending">Bekliyor</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        @if (!item.IsRejected)
+                                        {
+                                            @if (!item.IsConfirmed)
+                                            {
+                                                <a href="javascript:void(0);"
+                                                   onclick="confirmApprove('@Url.Action("ApproveAppointment", new { id = item.AppointmentId })')"
+                                                   class="btn-action btn-approve me-2" title="Onayla">
+                                                    <i class="fa fa-check"></i>
+                                                </a>
+                                            }
+
+                                            <a href="javascript:void(0);"
+                                               onclick="confirmReject('@Url.Action("CancelAppointment", new { id = item.AppointmentId })')"
+                                               class="btn-action btn-reject" title="Reddet">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-white-50 small"><i class="fa fa-lock me-1"></i>İşlem Yok</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center p-5 text-muted">
+                                    <i class="fa fa-inbox fa-3x mb-3"></i><br>
+                                    Bekleyen randevu talebi bulunmuyor.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <div class="alert alert-light border">
-        <small>🔴 Reddedildi | 🟡 Bekliyor | 🟢 Onaylandı</small>
-    </div>
-
-    <table class="table table-bordered table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Tarih / Saat</th>
-                <th>Üye</th>
-                <th>Eğitmen</th>
-                <th>Hizmet</th>
-                <th class="text-center">Durum</th>
-                <th class="text-center">İşlemler</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            <strong>@item.AppointmentDate.ToString("dd.MM.yyyy")</strong> <br />
-                            <span class="badge bg-light text-dark border">@item.AppointmentDate.ToString("HH:mm")</span>
-                        </td>
-                        <td>
-                            @if (item.AppUser != null)
-                            {
-                                <span>@item.AppUser.FirstName @item.AppUser.LastName</span> <br />
-                                <small class="text-muted">@item.AppUser.Email</small>
-                            }
-                            else
-                            {
-                                <span class="text-danger">Silinmiş Üye</span>
-                            }
-                        </td>
-                        <td>@item.Trainer?.FullName</td>
-                        <td>@item.Service?.ServiceName</td>
-                        
-                        <td class="text-center align-middle">
-                            @if (item.IsRejected)
-                            {
-                                <span class="badge bg-danger p-2">❌ Reddedildi</span>
-                            }
-                            else if (item.IsConfirmed)
-                            {
-                                <span class="badge bg-success p-2">✅ Onaylandı</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark p-2">⏳ Bekliyor</span>
-                            }
-                        </td>
-
-                        <td class="text-center align-middle">
-                            <div class="btn-group">
-                                @if (!item.IsRejected)
-                                {
-                                    @if (!item.IsConfirmed)
-                                    {
-                                        <a asp-action="ApproveAppointment" asp-route-id="@item.AppointmentId" 
-                                           class="btn btn-success btn-sm" title="Onayla">Onayla</a>
-                                    }
-                                    
-                                    <a asp-action="CancelAppointment" asp-route-id="@item.AppointmentId" 
-                                       class="btn btn-danger btn-sm" 
-                                       onclick="return confirm('Bu randevuyu reddetmek istediğinize emin misiniz?');">
-                                       Reddet
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted"><small>Sonuçlandı</small></span>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr><td colspan="6" class="text-center p-4">Kayıt yok.</td></tr>
-            }
-        </tbody>
-    </table>
 </div>
+
+<script>
+    // --- ONAYLA ---
+    function confirmApprove(url) {
+        Swal.fire({
+            title: 'Randevuyu Onayla',
+            text: "Bu randevuyu onaylamak istediğinize emin misiniz?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#38ef7d',  // Yeşil
+            cancelButtonColor: '#333',      // Koyu Gri
+            confirmButtonText: 'Evet, Onayla!',
+            cancelButtonText: 'Vazgeç',
+            background: '#25252b',          // Koyu Arka Plan
+            color: '#fff',                  // Beyaz Yazı
+            iconColor: '#38ef7d',           // Yeşil İkon
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url; // Linke git
+            }
+        })
+    }
+
+    // --- REDDET ---
+    function confirmReject(url) {
+        Swal.fire({
+            title: 'Randevuyu Reddet',
+            text: "Bu randevu iptal edilecek. Emin misiniz?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4d4d',  // Kırmızı
+            cancelButtonColor: '#333',      // Koyu Gri
+            confirmButtonText: 'Evet, Reddet!',
+            cancelButtonText: 'Vazgeç',
+            background: '#25252b',
+            color: '#fff',
+            iconColor: '#ff4d4d',           // Kırmızı İkon
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url; // Linke git
+            }
+        })
+    }
+</script>
