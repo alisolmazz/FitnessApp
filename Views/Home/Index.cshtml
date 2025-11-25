@@ -1,8 +1,127 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* --- HERO SECTION --- */
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        background: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop') no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        
+        /* SADECE BURASI İÇİN LAYOUT PADDING'İNİ GERİ ALIYORUZ */
+        margin-top: -100px; 
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), #1a1a1d);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        padding: 20px;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
+    .hero-title span { color: transparent; -webkit-text-stroke: 2px #38ef7d; }
+    .hero-subtitle { font-size: 1.3rem; color: #ddd; margin-bottom: 40px; font-weight: 300; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
+    .btn-hero {
+        padding: 18px 50px; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; border-radius: 50px;
+        border: none; background: #38ef7d; color: #000; transition: 0.3s; box-shadow: 0 0 25px rgba(56, 239, 125, 0.5); text-decoration: none; display: inline-block;
+    }
+    .btn-hero:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 0 40px rgba(255, 255, 255, 0.6); color: #000; }
+
+    /* --- STATS --- */
+    .stats-section { padding: 80px 0; background: #1a1a1d; border-bottom: 1px solid #333; width: 100%; }
+    .stat-item h3 { font-size: 3.5rem; font-weight: 800; color: #38ef7d; margin: 0; }
+    .stat-item p { font-size: 1.1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+
+    /* --- FEATURES --- */
+    .features-section { padding: 100px 0; background: #1a1a1d; width: 100%; }
+    .feature-card {
+        background: #25252b; padding: 50px 30px; border-radius: 25px; transition: 0.4s; border: 1px solid #333;
+        height: 100%; cursor: pointer; text-decoration: none; display: block; color: #fff;
+    }
+    .feature-card:hover { transform: translateY(-15px); border-color: #ffc107; box-shadow: 0 15px 40px rgba(255, 193, 7, 0.15); color: #fff; }
+    .feature-icon { font-size: 3rem; color: #ffc107; margin-bottom: 25px; }
+
+    /* --- AI PROMO --- */
+    .ai-promo-section { padding: 120px 0; background: #1f1f23; width: 100%; position: relative; overflow: hidden; }
+    .ai-card { background: rgba(0, 198, 255, 0.05); border: 1px solid #00c6ff; border-radius: 30px; padding: 60px; position: relative; backdrop-filter: blur(10px); }
+    .ai-glow { position: absolute; width: 300px; height: 300px; background: #00c6ff; filter: blur(180px); opacity: 0.3; border-radius: 50%; z-index: 0; }
+    .text-gradient-blue { background: linear-gradient(to right, #00c6ff, #0072ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    @Html.Raw("@keyframes fadeInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }")
+</style>
+
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">SADECE HAYAL ETME,<br><span>HAREKETE GEÇ.</span></h1>
+        <p class="hero-subtitle">FitnessApp ile antrenmanlarını planla, yapay zeka ile kişisel koçluk al ve en iyi versiyonuna ulaş.</p>
+        <a asp-controller="Account" asp-action="Login" class="btn-hero">Şimdi Başla <i class="fa fa-arrow-right ms-2"></i></a>
+    </div>
+</div>
+
+<div class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4 mb-md-0 stat-item"><h3>50+</h3><p>Uzman Eğitmen</p></div>
+            <div class="col-md-4 mb-4 mb-md-0 stat-item"><h3>20+</h3><p>Farklı Branş</p></div>
+            <div class="col-md-4 stat-item"><h3>1000+</h3><p>Mutlu Üye</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-4 text-white">NEDEN FITNESSAPP?</h2>
+            <p class="text-secondary fs-5">Sıradan bir spor salonu uygulamasından fazlası.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4"><a asp-controller="Appointment" asp-action="Booking" class="feature-card text-center d-block"><div class="feature-icon"><i class="fa fa-calendar-check"></i></div><h4>Kolay Randevu</h4><p class="text-muted">İstediğin eğitmen ve saat için saniyeler içinde randevu oluştur. Beklemek yok.</p></a></div>
+            <div class="col-md-4"><a asp-controller="Trainers" asp-action="Index" class="feature-card text-center d-block" style="border-color: #38ef7d; box-shadow: 0 0 15px rgba(56,239,125,0.1);"><div class="feature-icon" style="color: #38ef7d;"><i class="fa fa-dumbbell"></i></div><h4>Uzman Kadro</h4><p class="text-muted">Alanında uzman, sertifikalı antrenörlerle çalış. Hedefine en doğru yoldan git.</p></a></div>
+            <div class="col-md-4"><a asp-controller="Ai" asp-action="Index" class="feature-card text-center d-block"><div class="feature-icon"><i class="fa fa-mobile-alt"></i></div><h4>AI Destekli</h4><p class="text-muted">Telefondan veya bilgisayardan yapay zeka asistanına ulaş ve programını al.</p></a></div>
+        </div>
+    </div>
+</div>
+
+<div class="ai-promo-section">
+    <div class="container">
+        <div class="ai-card">
+            <div class="ai-glow" style="top: -50px; left: -50px;"></div>
+            <div class="ai-glow" style="bottom: -50px; right: -50px; background: #0072ff;"></div>
+            <div class="row align-items-center position-relative" style="z-index: 1;">
+                <div class="col-md-7">
+                    <h2 class="ai-title text-white fw-bold">GELECEĞİN KOÇU: <br><span class="text-gradient-blue">AI ASİSTAN</span></h2>
+                    <p class="lead text-white-50 mb-4">Ne yiyeceğini veya nasıl çalışacağını bilmiyor musun? Yapay zeka asistanımız vücut tipine ve hedefine göre sana özel <strong class="text-white">beslenme</strong> ve <strong class="text-white">antrenman</strong> programı hazırlasın.</p>
+                    <a asp-controller="Ai" asp-action="Index" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold"><i class="fa fa-robot me-2"></i> AI Koçu Dene</a>
+                </div>
+                <div class="col-md-5 text-center d-none d-md-block"><i class="fa fa-brain fa-10x" style="color: #00c6ff; text-shadow: 0 0 50px #00c6ff;"></i></div>
+            </div>
+        </div>
+    </div>
 </div>
