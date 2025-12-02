@@ -50,7 +50,7 @@ namespace FitnessApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                });  
 
             migrationBuilder.CreateTable(
                 name: "Services",
