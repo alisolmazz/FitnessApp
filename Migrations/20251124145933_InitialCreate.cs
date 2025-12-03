@@ -317,4 +317,4 @@ namespace FitnessApp.Migrations
                 name: "AspNetUsers");
         }
     }
-}
+}                    
