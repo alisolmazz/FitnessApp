@@ -1,0 +1,256 @@
+﻿@model IEnumerable<FitnessApp.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Eğitmenler";
+    var categories = Model.Select(t => t.Specialization).Distinct().ToList();
+}
+
+<style>
+    /* --- ARKA PLAN SORUNU İÇİN KESİN ÇÖZÜM (SABİT) --- */
+    html {
+        height: 100%;
+        background: 
+            linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+            url('https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop'); 
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: transparent !important;
+        color: #fff;
+    }
+
+    .trainers-page-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-top: 60px;
+        margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-weight: 800;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+
+    .page-header p {
+        color: #aaa;
+        font-size: 1.1rem;
+    }
+
+    /* FİLTRE BUTONLARI */
+    .filter-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 50px;
+        flex-wrap: wrap;
+    }
+
+    .btn-filter {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.3s;
+        backdrop-filter: blur(5px);
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+    }
+
+    /* --- GÜNCELLENEN RENK: ARTIK MAVİ --- */
+    .btn-filter:hover, .btn-filter.active {
+        background: #00c6ff; /* Neon Mavi */
+        color: #000;         /* Yazı Siyah (Okunabilirlik için) */
+        border-color: #00c6ff;
+        box-shadow: 0 0 20px rgba(0, 198, 255, 0.5); /* Mavi Glow */
+        transform: scale(1.05);
+    }
+
+    /* EĞİTMEN KARTI (DARK) */
+    .trainer-card-neon {
+        background: rgba(30, 30, 35, 0.95);
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        position: relative;
+        border: 1px solid #333;
+        transition: 0.4s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .trainer-card-neon:hover {
+        transform: translateY(-10px);
+        border-color: #00c6ff; /* Mavi Neon Kenarlık */
+        box-shadow: 0 0 25px rgba(0, 198, 255, 0.3); /* Mavi Glow */
+    }
+
+    .trainer-img-wrap {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 20px;
+        position: relative;
+    }
+
+    .trainer-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #333;
+        padding: 3px;
+        transition: 0.4s;
+    }
+
+    .trainer-card-neon:hover .trainer-img-wrap img {
+        border-color: #00c6ff; /* Resim çerçevesi de mavi */
+        transform: rotate(5deg);
+    }
+
+    .trainer-name {
+        font-weight: 700;
+        font-size: 1.4rem;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .trainer-spec {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ccc;
+        padding: 5px 15px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .trainer-time {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 25px;
+        border-top: 1px solid #333;
+        border-bottom: 1px solid #333;
+        padding: 10px 0;
+    }
+
+    .btn-card-action {
+        background: transparent;
+        border: 2px solid #fff;
+        color: #fff;
+        padding: 10px 0;
+        width: 100%;
+        border-radius: 12px;
+        display: block;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-card-action:hover {
+        background: #fff;
+        color: #000;
+    }
+    
+    .trainer-item { animation: fadeIn 0.6s ease; }
+    @Html.Raw("@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }")
+
+</style>
+
+<div class="trainers-page-wrapper">
+    <div class="container pb-5">
+        
+        <div class="page-header">
+            <h1>Uzman Kadromuz</h1>
+            <p>Hedeflerine ulaşman için seni motive edecek profesyoneller.</p>
+        </div>
+
+        <div class="filter-wrapper">
+            <button class="btn-filter active" onclick="filterTrainers('all', this)">Tümü</button>
+            @foreach (var cat in categories)
+            {
+                <button class="btn-filter" onclick="filterTrainers('@cat', this)">@cat</button>
+            }
+        </div>
+
+        <div class="row g-4 justify-content-center" id="trainerGrid">
+            @if (Model.Any())
+            {
+                @foreach (var trainer in Model)
+                {
+                    <div class="col-md-6 col-lg-3 trainer-item" data-category="@trainer.Specialization">
+                        <div class="trainer-card-neon">
+                            <div>
+                                <div class="trainer-img-wrap">
+                                    <img src="~/images/@trainer.ImageUrl" alt="@trainer.FullName">
+                                </div>
+                                
+                                <h4 class="trainer-name">@trainer.FullName</h4>
+                                <span class="trainer-spec">@trainer.Specialization</span>
+                                
+                                <div class="trainer-time">
+                                    <i class="fa fa-clock me-2 text-info"></i>
+                                    @trainer.WorkStartTime.ToString(@"hh\:mm") - @trainer.WorkEndTime.ToString(@"hh\:mm")
+                                </div>
+                            </div>
+
+                            <a asp-controller="Appointment" asp-action="Booking" asp-route-trainerId="@trainer.TrainerId" 
+                               class="btn-card-action">
+                               Randevu Al
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center text-muted">Kayıtlı eğitmen bulunamadı.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterTrainers(category, btnElement) {
+            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const items = document.querySelectorAll('.trainer-item');
+
+            items.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+
+                if (category === 'all' || itemCategory === category) {
+                    item.style.display = 'block';
+                    item.style.animation = 'none';
+                    item.offsetHeight; 
+                    item.style.animation = 'fadeIn 0.5s ease';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+}
