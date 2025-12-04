@@ -3,6 +3,9 @@ using FitnessApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.Threading.Tasks;
+using System;
 
 namespace FitnessApp.Controllers
 {
@@ -27,45 +30,34 @@ namespace FitnessApp.Controllers
         //              HİZMET YÖNETİMİ
         // ==========================================
 
-        // LİSTELEME
         public async Task<IActionResult> Services()
         {
-            var services = await _context.Services.ToListAsync();
+            // AsNoTracking: Sadece listeleme yapacağımız için EF Core'un değişiklik izlemesini kapatır, performans artar.
+            var services = await _context.Services.AsNoTracking().ToListAsync();
             return View(services);
         }
 
-        // EKLEME (GET)
         [HttpGet]
-        public IActionResult CreateService()
-        {
-            return View();
-        }
+        public IActionResult CreateService() => View();
 
-        // EKLEME (POST)
         [HttpPost]
+        [ValidateAntiForgeryToken] // Güvenlik önlemi
         public async Task<IActionResult> CreateService(Service service, IFormFile? file)
         {
-            if (file != null)
+            if (ModelState.IsValid)
             {
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", uniqueFileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                service.ImageUrl = uniqueFileName;
-            }
-            else
-            {
-                service.ImageUrl = "default-service.jpg";
-            }
+                // Helper metodumuzu kullandık
+                service.ImageUrl = await UploadImageAsync(file, "default-service.jpg");
 
-            _context.Services.Add(service);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Services");
+                _context.Services.Add(service);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Hizmet başarıyla oluşturuldu.";
+                return RedirectToAction(nameof(Services));
+            }
+            return View(service);
         }
 
-        // DÜZENLEME (GET) - YENİ EKLENDİ
         [HttpGet]
         public async Task<IActionResult> EditService(int id)
         {
@@ -74,37 +66,35 @@ namespace FitnessApp.Controllers
             return View(service);
         }
 
-        // DÜZENLEME (POST) - YENİ EKLENDİ
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(Service model, IFormFile? file)
         {
-            var service = await _context.Services.FindAsync(model.ServiceId);
-            if (service == null) return NotFound();
+            // ID manipülasyonunu engellemek için veritabanından asıl veriyi çekiyoruz
+            var existingService = await _context.Services.FindAsync(model.ServiceId);
+            if (existingService == null) return NotFound();
 
-            // Bilgileri güncelle
-            service.ServiceName = model.ServiceName;
-            service.Description = model.Description;
-            service.DurationMinutes = model.DurationMinutes;
-            service.Price = model.Price;
-
-            // Yeni resim varsa güncelle
-            if (file != null)
+            if (ModelState.IsValid)
             {
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", uniqueFileName);
+                existingService.ServiceName = model.ServiceName;
+                existingService.Description = model.Description;
+                existingService.DurationMinutes = model.DurationMinutes;
+                existingService.Price = model.Price;
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Sadece yeni bir dosya yüklenmişse resim değişir
+                if (file != null)
                 {
-                    await file.CopyToAsync(stream);
+                    // İstersen burada eski resmi silme kodu da yazılabilir (System.IO.File.Delete...)
+                    existingService.ImageUrl = await UploadImageAsync(file);
                 }
-                service.ImageUrl = uniqueFileName;
-            }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Services");
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Hizmet güncellendi.";
+                return RedirectToAction(nameof(Services));
+            }
+            return View(model);
         }
 
-        // SİLME
         public async Task<IActionResult> DeleteService(int id)
         {
             var service = await _context.Services.FindAsync(id);
@@ -112,95 +102,77 @@ namespace FitnessApp.Controllers
             {
                 _context.Services.Remove(service);
                 await _context.SaveChangesAsync();
+                TempData["WarningMessage"] = "Hizmet silindi.";
             }
-            return RedirectToAction("Services");
+            return RedirectToAction(nameof(Services));
         }
 
         // ==========================================
-        //             EĞİTMEN YÖNETİMİ
+        //              EĞİTMEN YÖNETİMİ
         // ==========================================
 
-        // LİSTELEME
         public async Task<IActionResult> Trainers()
         {
-            var trainers = await _context.Trainers.ToListAsync();
+            var trainers = await _context.Trainers.AsNoTracking().ToListAsync();
             return View(trainers);
         }
 
-        // EKLEME (GET)
         [HttpGet]
-        public IActionResult CreateTrainer()
-        {
-            return View();
-        }
+        public IActionResult CreateTrainer() => View();
 
-        // EKLEME (POST)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTrainer(Trainer trainer, IFormFile? file)
         {
-            if (file != null)
+            if (ModelState.IsValid)
             {
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", uniqueFileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                trainer.ImageUrl = uniqueFileName;
-            }
-            else
-            {
-                trainer.ImageUrl = "default-user.png";
-            }
+                trainer.ImageUrl = await UploadImageAsync(file, "default-user.png");
 
-            if (trainer.WorkStartTime == TimeSpan.Zero) { trainer.WorkStartTime = new TimeSpan(9, 0, 0); }
-            if (trainer.WorkEndTime == TimeSpan.Zero) { trainer.WorkEndTime = new TimeSpan(17, 0, 0); }
+                // Saat atamalarını daha kısa yazdık
+                if (trainer.WorkStartTime == TimeSpan.Zero) trainer.WorkStartTime = new TimeSpan(9, 0, 0);
+                if (trainer.WorkEndTime == TimeSpan.Zero) trainer.WorkEndTime = new TimeSpan(17, 0, 0);
 
-            _context.Trainers.Add(trainer);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Trainers");
+                _context.Trainers.Add(trainer);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Eğitmen başarıyla eklendi.";
+                return RedirectToAction(nameof(Trainers));
+            }
+            return View(trainer);
         }
 
-        // DÜZENLEME (GET) - YENİ EKLENDİ
         [HttpGet]
         public async Task<IActionResult> EditTrainer(int id)
         {
             var trainer = await _context.Trainers.FindAsync(id);
-            if (trainer == null) return NotFound();
-            return View(trainer);
+            return trainer == null ? NotFound() : View(trainer);
         }
 
-        // DÜZENLEME (POST) - YENİ EKLENDİ
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTrainer(Trainer model, IFormFile? file)
         {
             var trainer = await _context.Trainers.FindAsync(model.TrainerId);
             if (trainer == null) return NotFound();
 
-            // Bilgileri güncelle
-            trainer.FullName = model.FullName;
-            trainer.Specialization = model.Specialization;
-            trainer.WorkStartTime = model.WorkStartTime;
-            trainer.WorkEndTime = model.WorkEndTime;
-
-            // Yeni resim varsa güncelle
-            if (file != null)
+            if (ModelState.IsValid)
             {
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", uniqueFileName);
+                trainer.FullName = model.FullName;
+                trainer.Specialization = model.Specialization;
+                trainer.WorkStartTime = model.WorkStartTime;
+                trainer.WorkEndTime = model.WorkEndTime;
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                if (file != null)
                 {
-                    await file.CopyToAsync(stream);
+                    trainer.ImageUrl = await UploadImageAsync(file);
                 }
-                trainer.ImageUrl = uniqueFileName;
-            }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Trainers");
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Eğitmen bilgileri güncellendi.";
+                return RedirectToAction(nameof(Trainers));
+            }
+            return View(model);
         }
 
-        // SİLME
         public async Task<IActionResult> DeleteTrainer(int id)
         {
             var trainer = await _context.Trainers.FindAsync(id);
@@ -208,17 +180,19 @@ namespace FitnessApp.Controllers
             {
                 _context.Trainers.Remove(trainer);
                 await _context.SaveChangesAsync();
+                TempData["WarningMessage"] = "Eğitmen silindi.";
             }
-            return RedirectToAction("Trainers");
+            return RedirectToAction(nameof(Trainers));
         }
 
         // ==========================================
-        //             RANDEVU YÖNETİMİ
+        //              RANDEVU YÖNETİMİ
         // ==========================================
 
         public async Task<IActionResult> Appointments()
         {
             var appointments = await _context.Appointments
+                .AsNoTracking() // Performans
                 .Include(a => a.AppUser)
                 .Include(a => a.Trainer)
                 .Include(a => a.Service)
@@ -228,30 +202,53 @@ namespace FitnessApp.Controllers
             return View(appointments);
         }
 
-        // ONAYLA
-        public async Task<IActionResult> ApproveAppointment(int id)
+        // Durum değiştirme işlemlerini tek bir metoda indirgedim (Opsiyonel ama daha temiz)
+        public async Task<IActionResult> ChangeAppointmentStatus(int id, string status)
         {
             var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
+            if (appointment == null) return NotFound();
+
+            if (status == "approve")
             {
                 appointment.IsConfirmed = true;
                 appointment.IsRejected = false;
-                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Randevu onaylandı.";
             }
-            return RedirectToAction("Appointments");
+            else if (status == "cancel")
+            {
+                appointment.IsConfirmed = false;
+                appointment.IsRejected = true;
+                TempData["WarningMessage"] = "Randevu reddedildi.";
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Appointments));
         }
 
-        // REDDET
-        public async Task<IActionResult> CancelAppointment(int id)
+        // ==========================================
+        //              YARDIMCI METOTLAR
+        // ==========================================
+
+        // Resim yükleme kodunu tek bir yerde topladık (DRY Prensibi)
+        private async Task<string> UploadImageAsync(IFormFile? file, string defaultImageName = null)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
+            if (file == null) return defaultImageName;
+
+            // Güvenli dosya adı oluşturma (Guid + Orijinal isimdeki boşlukları temizleme)
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName.Replace(" ", "_");
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+
+            // Klasör yoksa oluştur (Hata almamak için)
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                appointment.IsRejected = true;
-                appointment.IsConfirmed = false;
-                await _context.SaveChangesAsync();
+                await file.CopyToAsync(stream);
             }
-            return RedirectToAction("Appointments");
+
+            return uniqueFileName;
         }
     }
 }
