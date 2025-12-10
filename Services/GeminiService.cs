@@ -7,7 +7,7 @@ namespace FitnessApp.Services
     {
         private readonly HttpClient _httpClient;
 
-        // API Key (Bu kısım sizde tanımlı olmalı)
+        // API Key
         private const string ApiKey = "AIzaSyBl5X954J__SVfB0WUHh7lVQGs9s49RWAY";
 
         private const string ApiUrl =
