@@ -13,6 +13,6 @@ namespace FitnessApp.ViewModels
         public TimeSpan Time { get; set; } // Saat (Örn: 14:00)
         public bool IsAvailable { get; set; } // Müsait mi? (Yeşil buton)
         public string StatusMessage { get; set; } // "Dolu", "Geçti" vs.
-    }
+    }  
 }
 
