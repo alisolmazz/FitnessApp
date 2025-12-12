@@ -6,7 +6,7 @@
 
 <style>
     /* --- SAYFA GENELİ --- */
-    html {
+    html {    
         height: 100%;
         background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)), url('[https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop](https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop)');
         background-size: cover;
@@ -20,12 +20,12 @@
         font-family: 'Poppins', sans-serif;
         margin: 0;
     }
-
+   
     .ai-page-container {
         min-height: 100vh;
         padding: 50px 0;
     }
-
+      
     /* FORM KARTI */
     .ai-form-card {
         background: rgba(20, 20, 25, 0.9);
@@ -35,14 +35,14 @@
         backdrop-filter: blur(20px);
         box-shadow: 0 0 30px rgba(0, 242, 254, 0.1);
         height: 100%;
-    }
+    }   
 
     .ai-header h2 {
-        font-weight: 800;
+        font-weight: 800;  
         background: linear-gradient(to right, #4facfe, #00f2fe);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin: 0;
+        margin: 0;    
         text-transform: uppercase;
         letter-spacing: 2px;
     }
@@ -58,7 +58,7 @@
         color: #00f2fe;
         font-weight: 600;
         font-size: 0.9rem;
-    }
+    }   
 
     .form-control, .form-select {
         background: rgba(0,0,0,0.3);
@@ -104,7 +104,7 @@
     /* --- YENİ KUTU TASARIMLARI (AI ÇIKTISI) --- */
     .ai-box {
         border-radius: 15px;
-        overflow: hidden;
+        overflow: hidden;   
         height: 100%;
         transition: all 0.3s ease;
         background: rgba(30, 30, 35, 0.8);
@@ -142,7 +142,7 @@
             margin: 0;
             list-style: none;
         }
-
+   
         .box-content li {
             margin-bottom: 10px;
             position: relative;
@@ -173,13 +173,13 @@
         .nutrition-box .box-content li::before {
             content: '🍎';
         }
-
+    
     /* ANTRENMAN KUTUSU ÖZEL */
     .workout-box {
         border-color: #00f2fe;
         box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
     }
-
+  
         .workout-box .box-header {
             background: rgba(0, 242, 254, 0.15);
             color: #00f2fe;
@@ -188,7 +188,7 @@
 
         .workout-box .box-content li::before {
             content: '⚡';
-        }
+        }  
 
     /* LOADING */
     .loading-overlay {
@@ -205,7 +205,7 @@
         justify-content: center;
     }
 
-</style>
+</style>  
 
 <div class="loading-overlay" id="loadingBox">
     <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
@@ -296,10 +296,10 @@
     </div>
 </div>
 
-<script>
+<script>       
     document.getElementById('aiForm')?.addEventListener('submit', function () {
         document.getElementById('loadingBox').style.display = 'flex';
         document.getElementById('btnGenerate').disabled = true;
-        document.getElementById('btnGenerate').innerHTML = '<i class="fa fa-spinner fa-spin"></i> Bekleyiniz...';
+        document.getElementById('btnGenerate').innerHTML = '<i class="fa fa-spinner fa-spin"></i> Bekleyiniz...';         
     });
 </script>
