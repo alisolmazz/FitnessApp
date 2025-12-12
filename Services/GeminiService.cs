@@ -68,10 +68,10 @@ namespace FitnessApp.Services
             var requestBody = new
             {
                 contents = new[]
-                {
+                { 
                     new
                     {
-                        parts = new[] { new { text = prompt } }
+                        parts = new[] { new { text = prompt } } 
                     }
                 }
             };
