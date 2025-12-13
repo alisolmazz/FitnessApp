@@ -11,12 +11,14 @@ namespace FitnessApp.Models
         public bool IsConfirmed { get; set; } = false;
         
         // --- Reddedilme Alanı ---
-        public bool IsRejected { get; set; } = false; 
+        public bool IsRejected { get; set; } = false;
+
 
         // --- Fiyat Alanı (Tek fiyata döndü) --- 
         public decimal Price { get; set; } 
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+
 
         // İlişkiler
         public string AppUserId { get; set; } 

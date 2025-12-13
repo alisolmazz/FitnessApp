@@ -10,9 +10,10 @@ namespace FitnessApp.Models
         public string FullName { get; set; }
 
         [Required(ErrorMessage = "Uzmanlık alanı zorunludur.")]
-        public string Specialization { get; set; } // Örn: Fitness, Yoga (Hizmet ile eşleşecek kilit nokta)
+        public string Specialization { get; set; }  // Örn: Fitness, Yoga (Hizmet ile eşleşecek kilit nokta)
 
         public string ImageUrl { get; set; }
+
 
         // MESAİ SAATLERİ (Randevu kontrolü için kritik)
         public TimeSpan WorkStartTime { get; set; } 
