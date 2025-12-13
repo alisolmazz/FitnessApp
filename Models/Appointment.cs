@@ -13,7 +13,7 @@ namespace FitnessApp.Models
         // --- Reddedilme Alanı ---
         public bool IsRejected { get; set; } = false; 
 
-        // --- Fiyat Alanı (Tek fiyata döndü) ---
+        // --- Fiyat Alanı (Tek fiyata döndü) --- 
         public decimal Price { get; set; } 
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
