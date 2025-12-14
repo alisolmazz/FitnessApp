@@ -7,7 +7,7 @@ namespace FitnessApp.Models
         public int ServiceId { get; set; }
 
         [Required(ErrorMessage = "Hizmet adı zorunludur.")]
-        public string ServiceName { get; set; } // Örn: Pilates, Fitness
+        public string ServiceName { get; set; } // Örn: Pilates, Fitness 
 
         public string Description { get; set; } // Örn: Birebir özel ders...
         
